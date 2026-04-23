@@ -5,14 +5,15 @@ import { client, hasDatabaseConfig } from "@workspace/db";
 const router: IRouter = Router();
 
 router.get("/healthz", async (_req, res) => {
-  if (!hasDatabaseConfig() || !client) {
+  const dbClient = client;
+  if (!hasDatabaseConfig() || !dbClient) {
     const data = HealthCheckResponse.parse({ status: "degraded" });
     res.status(503).json(data);
     return;
   }
 
   try {
-    await client`select 1`;
+    await dbClient`select 1`;
     const data = HealthCheckResponse.parse({ status: "ok" });
     res.json(data);
   } catch {
