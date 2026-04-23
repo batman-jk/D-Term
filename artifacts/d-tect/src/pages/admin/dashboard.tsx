@@ -1,6 +1,6 @@
 import { useGetStatsOverview, getGetStatsOverviewQueryKey } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Users, CheckCircle2, TrendingUp, AlertCircle, BarChart, BookOpen } from "lucide-react";
+import { FileText, Users, CheckCircle, TrendingUp, AlertTriangle, BarChart, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,7 @@ export default function AdminDashboard() {
     return (
       <div className="container py-10">
         <div className="rounded-lg border border-destructive/50 p-6 bg-destructive/10 text-destructive flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 mt-0.5" />
+          <AlertTriangle className="w-5 h-5 mt-0.5" />
           <div>
             <h3 className="font-semibold">Failed to load dashboard</h3>
             <p className="text-sm opacity-90">Please ensure the backend is running.</p>
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
     <div className="container py-8 space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">Overview of D-Tect system activity and performance.</p>
+        <p className="text-muted-foreground mt-2">Overview of D-Term system activity and performance.</p>
       </div>
 
       {isLoading ? (
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Exams</CardTitle>
-              <CheckCircle2 className="h-4 w-4 text-primary" />
+              <CheckCircle className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeExams}</div>
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.averageScore.toFixed(1)}<span className="text-sm text-muted-foreground font-normal">/5</span></div>
+              <div className="text-2xl font-bold">{(stats.averageScore || 0).toFixed(1)}<span className="text-sm text-muted-foreground font-normal">/5</span></div>
               <p className="text-xs text-muted-foreground mt-1">
                 Across all submissions
               </p>
@@ -145,11 +145,11 @@ export default function AdminDashboard() {
                       <div className="flex items-center text-xs text-muted-foreground gap-2">
                         <span>{sub.examTitle}</span>
                         <span>•</span>
-                        <span>{format(new Date(sub.submittedAt), "MMM d, h:mm a")}</span>
+                        <span>{format(new Date(sub.submittedAt || Date.now()), "MMM d, h:mm a")}</span>
                       </div>
                     </div>
                     <div>
-                      {sub.score !== null ? (
+                      {typeof sub.score === 'number' ? (
                         <Badge variant={sub.score >= 3 ? "default" : "secondary"}>
                           Score: {sub.score}/5
                         </Badge>

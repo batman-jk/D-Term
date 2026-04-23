@@ -1,16 +1,43 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "./schema";
 
-const { Pool } = pg;
+const databaseUrl = process.env.DATABASE_URL;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+const createDatabase = (connectionString: string) => {
+  const sql = postgres(connectionString, { prepare: false });
+  const database = drizzle(sql, { schema });
+
+  return { sql, database };
+};
+
+type DatabaseBundle = ReturnType<typeof createDatabase>;
+type Database = DatabaseBundle["database"];
+type DatabaseClient = DatabaseBundle["sql"];
+
+let client: DatabaseClient | null = null;
+let db: Database | null = null;
+
+if (databaseUrl) {
+  const bundle = createDatabase(databaseUrl);
+  client = bundle.sql;
+  db = bundle.database;
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+export { client };
+
+export function hasDatabaseConfig(): boolean {
+  return Boolean(databaseUrl);
+}
+
+export function getDb(): Database {
+  if (!db) {
+    throw new Error(
+      "DATABASE_URL must be set. Add a valid database connection string before using the API.",
+    );
+  }
+
+  return db;
+}
 
 export * from "./schema";

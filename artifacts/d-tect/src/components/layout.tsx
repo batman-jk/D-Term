@@ -15,18 +15,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const isAdmin = role === "admin";
   const isStudent = role === "student";
 
-  // Hide layout for exam taking mode to enforce fullscreen focus
-  if (location === "/student/exam") {
-    return <>{children}</>;
+  // More robust landing page detection
+  const isLanding = location === "/" || location === "" || location.endsWith("/index.html");
+  const isExam = location === "/student/exam";
+
+  // Hide layout for immersive landing or exam taking mode
+  // If we're on the landing page and not specifically logged in, hide the header
+  if (isExam || (isLanding && !role)) {
+    return (
+      <main className="min-h-screen bg-background">
+        {children}
+      </main>
+    );
   }
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col bg-background overflow-clip">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center justify-between">
           <div className="flex items-center gap-6 md:gap-8">
-            <Link href={isAdmin ? "/admin" : isStudent ? "/student" : "/"} className="flex items-center space-x-2">
-              <span className="font-bold text-xl tracking-tight">D-Tect</span>
+            <Link href={isAdmin ? "/admin" : (isStudent && !!studentProfile) ? "/student" : "/"} className="flex items-center space-x-2">
+              <span className="font-bold text-xl tracking-tight">D-Term</span>
             </Link>
             
             {isAdmin && (
@@ -58,7 +67,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               </nav>
             )}
 
-            {isStudent && (
+            {isStudent && !!studentProfile && (
               <nav className="hidden md:flex items-center space-x-1 text-sm font-medium">
                 <Link 
                   href="/student" 
@@ -119,7 +128,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      {isStudent && (
+      {isStudent && !!studentProfile && (
         <div className="md:hidden border-b bg-muted/40">
           <div className="container flex overflow-x-auto py-2 gap-2 hide-scrollbar">
             <Link href="/student" className="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md bg-secondary text-secondary-foreground">

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Home } from "lucide-react";
+import { CheckCircle, Home } from "lucide-react";
 import { Link } from "wouter";
 
 export default function StudentResults() {
@@ -9,7 +9,7 @@ export default function StudentResults() {
       <Card className="text-center border-primary/20">
         <CardHeader className="pb-4">
           <div className="mx-auto w-16 h-16 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-500 rounded-full flex items-center justify-center mb-4">
-            <CheckCircle2 className="w-8 h-8" />
+            <CheckCircle className="w-8 h-8" />
           </div>
           <CardTitle className="text-3xl font-bold">Submission Received</CardTitle>
         </CardHeader>

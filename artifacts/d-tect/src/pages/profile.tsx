@@ -31,7 +31,7 @@ export default function Profile() {
               Session Information
             </CardTitle>
             <CardDescription>
-              Your current active session details on D-Tect.
+              Your current active session details on D-Term.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">

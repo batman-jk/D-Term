@@ -1,10 +1,11 @@
+import { examsTable, getDb, studentsTable, submissionsTable } from "@workspace/db";
+import { count, eq } from "drizzle-orm";
 import { Router, type IRouter } from "express";
-import { eq, count } from "drizzle-orm";
-import { db, examsTable, studentsTable, submissionsTable } from "@workspace/db";
 
 const router: IRouter = Router();
 
 router.get("/stats/overview", async (_req, res): Promise<void> => {
+  const db = getDb();
   const exams = await db.select().from(examsTable);
   const [studentCount] = await db.select({ count: count() }).from(studentsTable);
   const [submissionCount] = await db.select({ count: count() }).from(submissionsTable);
@@ -26,22 +27,25 @@ router.get("/stats/overview", async (_req, res): Promise<void> => {
     .orderBy(submissionsTable.submittedAt)
     .limit(5);
 
-  const scoredSubs = recentSubmissions.filter((s) => s.score !== null);
-  const avgScore = scoredSubs.length > 0
-    ? scoredSubs.reduce((sum, s) => sum + (s.score ?? 0), 0) / scoredSubs.length
-    : 0;
+  const scoredSubmissions = recentSubmissions.filter((submission) => submission.score !== null);
+  const averageScore =
+    scoredSubmissions.length > 0
+      ? scoredSubmissions.reduce((sum, submission) => sum + (submission.score ?? 0), 0) /
+        scoredSubmissions.length
+      : 0;
 
   res.json({
     totalExams: exams.length,
-    activeExams: exams.filter((e) => e.status === "active").length,
+    activeExams: exams.filter((exam) => exam.status === "active").length,
     totalStudents: studentCount?.count ?? 0,
     totalSubmissions: submissionCount?.count ?? 0,
-    averageScore: avgScore,
+    averageScore,
     recentSubmissions,
   });
 });
 
 router.get("/stats/student-performance", async (_req, res): Promise<void> => {
+  const db = getDb();
   const students = await db.select().from(studentsTable);
 
   const performance = await Promise.all(
@@ -63,10 +67,12 @@ router.get("/stats/student-performance", async (_req, res): Promise<void> => {
         .where(eq(submissionsTable.studentId, student.id))
         .orderBy(submissionsTable.submittedAt);
 
-      const scoredSubs = submissions.filter((s) => s.score !== null);
-      const avgScore = scoredSubs.length > 0
-        ? scoredSubs.reduce((sum, s) => sum + (s.score ?? 0), 0) / scoredSubs.length
-        : 0;
+      const scoredSubmissions = submissions.filter((submission) => submission.score !== null);
+      const averageScore =
+        scoredSubmissions.length > 0
+          ? scoredSubmissions.reduce((sum, submission) => sum + (submission.score ?? 0), 0) /
+            scoredSubmissions.length
+          : 0;
 
       return {
         studentId: student.id,
@@ -74,7 +80,7 @@ router.get("/stats/student-performance", async (_req, res): Promise<void> => {
         rollNumber: student.rollNumber,
         department: student.department,
         totalExamsTaken: submissions.length,
-        averageScore: avgScore,
+        averageScore,
         submissions,
       };
     }),

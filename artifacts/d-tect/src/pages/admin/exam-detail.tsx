@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Key, Plus, Trash2, Edit2, PlayCircle, Settings, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Key, Plus, Trash2, Edit2, PlayCircle, Settings, CheckCircle } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -218,7 +218,7 @@ export default function AdminExamDetail() {
                 </Select>
                 {exam.status === "active" && (
                   <p className="text-xs text-green-600 flex items-center mt-2">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    <CheckCircle className="w-3 h-3 mr-1" />
                     Students can join and submit
                   </p>
                 )}
@@ -330,7 +330,7 @@ export default function AdminExamDetail() {
                               className={`p-2 text-sm rounded-md border ${opt === q.correctAnswer ? 'bg-primary/10 border-primary border-dashed font-medium text-primary' : 'bg-muted/50'}`}
                             >
                               {opt}
-                              {opt === q.correctAnswer && <CheckCircle2 className="inline w-3.5 h-3.5 ml-2" />}
+                              {opt === q.correctAnswer && <CheckCircle className="inline w-3.5 h-3.5 ml-2" />}
                             </div>
                           ))}
                         </div>

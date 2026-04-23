@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { useCreateSubmission } from "@workspace/api-client-react";
-import { ExamWithQuestions } from "@workspace/api-client-react/src/generated/api.schemas";
+import { ExamWithQuestions } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Maximize, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Maximize, ShieldAlert, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function StudentExam() {
@@ -181,7 +181,7 @@ export default function StudentExam() {
                       onValueChange={(val) => handleAnswer(currentQ.id, val)}
                       className="space-y-3"
                     >
-                      {currentQ.options.map((opt, idx) => (
+                      {currentQ.options.map((opt: string, idx: number) => (
                         <div key={idx} className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-muted/50 transition-colors [&:has([data-state=checked])]:border-primary [&:has([data-state=checked])]:bg-primary/5">
                           <RadioGroupItem value={opt} id={`opt-${idx}`} className="w-5 h-5" />
                           <Label htmlFor={`opt-${idx}`} className="flex-1 text-base cursor-pointer font-normal leading-relaxed">{opt}</Label>
@@ -233,7 +233,7 @@ export default function StudentExam() {
           </div>
           <div className="flex-1 overflow-y-auto p-4 content-start">
             <div className="grid grid-cols-4 gap-2">
-              {questions.map((q, idx) => {
+              {questions.map((q: any, idx: number) => {
                 const isAnswered = !!answers[q.id];
                 const isCurrent = idx === currentQIndex;
                 

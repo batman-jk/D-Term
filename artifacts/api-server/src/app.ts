@@ -1,8 +1,8 @@
-import express, { type Express } from "express";
 import cors from "cors";
+import express, { type ErrorRequestHandler, type Express } from "express";
 import pinoHttp from "pino-http";
-import router from "./routes";
 import { logger } from "./lib/logger";
+import router from "./routes";
 
 const app: Express = express();
 
@@ -30,5 +30,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", router);
+
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  if (err instanceof Error && err.message.includes("DATABASE_URL")) {
+    res.status(503).json({
+      error: err.message,
+      code: "DATABASE_UNAVAILABLE",
+    });
+    return;
+  }
+
+  logger.error({ err }, "Unhandled application error");
+  res.status(500).json({
+    error: "Internal server error",
+    code: "INTERNAL_SERVER_ERROR",
+  });
+};
+
+app.use(errorHandler);
 
 export default app;

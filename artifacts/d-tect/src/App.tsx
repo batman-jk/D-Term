@@ -8,12 +8,14 @@ import { Layout } from "@/components/layout";
 // Pages
 import NotFound from "@/pages/not-found";
 import Landing from "@/pages/index";
+import RoleSelection from "@/pages/role-selection";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminExams from "@/pages/admin/exams";
 import AdminExamDetail from "@/pages/admin/exam-detail";
 import AdminPerformance from "@/pages/admin/performance";
 import AdminResources from "@/pages/admin/resources";
 import StudentHome from "@/pages/student/home";
+import StudentLogin from "@/pages/student/login";
 import StudentJoin from "@/pages/student/join";
 import StudentExam from "@/pages/student/exam";
 import StudentResults from "@/pages/student/results";
@@ -33,6 +35,7 @@ function Router() {
     <Layout>
       <Switch>
         <Route path="/" component={Landing} />
+        <Route path="/role-selection" component={RoleSelection} />
         
         {/* Admin Routes */}
         <Route path="/admin" component={AdminDashboard} />
@@ -43,6 +46,7 @@ function Router() {
 
         {/* Student Routes */}
         <Route path="/student" component={StudentHome} />
+        <Route path="/student/login" component={StudentLogin} />
         <Route path="/student/join" component={StudentJoin} />
         <Route path="/student/exam" component={StudentExam} />
         <Route path="/student/results" component={StudentResults} />

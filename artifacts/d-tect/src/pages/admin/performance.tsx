@@ -136,7 +136,7 @@ export default function AdminPerformance() {
                       <div>
                         <CardTitle className="text-lg">{sub.examTitle}</CardTitle>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Submitted: {format(new Date(sub.submittedAt), "PPP 'at' p")}
+                          Submitted: {format(new Date(sub.submittedAt || Date.now()), "PPP 'at' p")}
                         </p>
                       </div>
                       <div className="flex flex-col items-end gap-2">

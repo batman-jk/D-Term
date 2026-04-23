@@ -1,50 +1,47 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useCreateStudent, useJoinExam } from "@workspace/api-client-react";
+import { useJoinExam } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Lock, GraduationCap, ArrowRight } from "lucide-react";
+import { Lock, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export default function StudentJoin() {
-  const { studentProfile, setStudentProfile } = useAuth();
+  const { role, studentProfile } = useAuth();
   const [, setLocation] = useLocation();
   
   const [code, setCode] = useState("");
-  const [name, setName] = useState(studentProfile?.name || "");
-  const [rollNumber, setRollNumber] = useState(studentProfile?.rollNumber || "");
-  const [department, setDepartment] = useState(studentProfile?.department || "");
-
-  const createStudent = useCreateStudent();
   const joinExam = useJoinExam();
+
+  useEffect(() => {
+    if (role !== "student") {
+      setLocation("/role-selection");
+    } else if (!studentProfile) {
+      setLocation("/student/login");
+    }
+  }, [role, studentProfile, setLocation]);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code || !name || !rollNumber || !department) {
-      toast.error("Please fill in all fields");
+    if (!code || code.length < 3) {
+      toast.error("Please enter a valid code");
+      return;
+    }
+
+    if (!studentProfile?.id) {
+      toast.error("Student profile missing. Please log in.");
+      setLocation("/student/login");
       return;
     }
 
     try {
-      // First ensure student exists
-      let studentId = studentProfile?.id;
-      
-      if (!studentId || name !== studentProfile?.name || rollNumber !== studentProfile?.rollNumber) {
-        const student = await createStudent.mutateAsync({
-          data: { name, rollNumber, department }
-        });
-        studentId = student.id;
-        setStudentProfile(student);
-      }
-
       // Join exam
       const exam = await joinExam.mutateAsync({
         data: {
           code: code.toUpperCase(),
-          studentId: studentId
+          studentId: studentProfile.id
         }
       });
 
@@ -55,10 +52,11 @@ export default function StudentJoin() {
       setLocation("/student/exam");
 
     } catch (error: any) {
-      // Orval default customFetch throws Error object or ErrorType
       toast.error("Invalid code or exam is not active");
     }
   };
+
+  if (!studentProfile) return null;
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-4 bg-muted/20">
@@ -84,55 +82,22 @@ export default function StudentJoin() {
                   className="text-center text-2xl font-mono tracking-[0.5em] h-16 uppercase placeholder:text-muted-foreground/50 border-2"
                   maxLength={6}
                   required
+                  autoFocus
                 />
               </div>
             </div>
-
-            <div className="bg-muted/50 p-4 rounded-lg space-y-4 border">
-              <div className="flex items-center gap-2 mb-2 text-sm font-medium text-muted-foreground">
-                <GraduationCap className="w-4 h-4" />
-                Student Details
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input 
-                  id="name" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
-                  required 
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="roll">Roll Number</Label>
-                  <Input 
-                    id="roll" 
-                    value={rollNumber} 
-                    onChange={(e) => setRollNumber(e.target.value)} 
-                    required 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="dept">Department</Label>
-                  <Input 
-                    id="dept" 
-                    value={department} 
-                    onChange={(e) => setDepartment(e.target.value)} 
-                    required 
-                  />
-                </div>
-              </div>
+            
+            <div className="text-sm text-center text-muted-foreground px-4">
+              Joining as <span className="font-semibold text-foreground">{studentProfile.name}</span> ({studentProfile.rollNumber})
             </div>
           </CardContent>
           <CardFooter className="pb-8">
             <Button 
               type="submit" 
               className="w-full h-12 text-lg font-medium"
-              disabled={createStudent.isPending || joinExam.isPending || code.length < 3}
+              disabled={joinExam.isPending || code.length < 3}
             >
-              {(createStudent.isPending || joinExam.isPending) ? "Connecting..." : "Begin Assessment"}
+              {joinExam.isPending ? "Connecting..." : "Begin Assessment"}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </CardFooter>

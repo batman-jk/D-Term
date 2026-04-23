@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { ExamStatus, ExamType } from "@workspace/api-client-react/src/generated/api.schemas";
+// types removed
 
 export default function AdminExams() {
   const queryClient = useQueryClient();
@@ -69,7 +69,7 @@ export default function AdminExams() {
     }
   };
 
-  const getStatusBadge = (status: ExamStatus) => {
+  const getStatusBadge = (status: "draft" | "active" | "past") => {
     switch (status) {
       case "active":
         return <Badge variant="default" className="bg-green-600 hover:bg-green-700">Active</Badge>;
@@ -77,6 +77,8 @@ export default function AdminExams() {
         return <Badge variant="secondary">Draft</Badge>;
       case "past":
         return <Badge variant="outline" className="text-muted-foreground">Past</Badge>;
+      default:
+        return null;
     }
   };
 

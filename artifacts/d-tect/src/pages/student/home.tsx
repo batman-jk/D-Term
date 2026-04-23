@@ -15,7 +15,7 @@ export default function StudentHome() {
 
   useEffect(() => {
     if (!studentProfile) {
-      setLocation("/student/join");
+      setLocation("/student/login");
     }
   }, [studentProfile, setLocation]);
 

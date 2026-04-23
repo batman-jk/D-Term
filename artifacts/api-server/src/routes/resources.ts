@@ -1,15 +1,16 @@
-import { Router, type IRouter } from "express";
-import { eq } from "drizzle-orm";
-import { db, resourcesTable } from "@workspace/db";
 import {
   CreateResourceBody,
   DeleteResourceParams,
   ListResourcesQueryParams,
 } from "@workspace/api-zod";
+import { getDb, resourcesTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
+import { Router, type IRouter } from "express";
 
 const router: IRouter = Router();
 
 router.get("/resources", async (req, res): Promise<void> => {
+  const db = getDb();
   const parsed = ListResourcesQueryParams.safeParse(req.query);
   const examId = parsed.success ? parsed.data.examId : undefined;
 
@@ -18,12 +19,17 @@ router.get("/resources", async (req, res): Promise<void> => {
     .from(resourcesTable)
     .orderBy(resourcesTable.createdAt);
 
-  const filtered = examId ? resources.filter((r) => r.examId === examId) : resources;
+  const filtered = examId
+    ? resources.filter((resource) => resource.examId === examId)
+    : resources;
+
   res.json(filtered);
 });
 
 router.post("/resources", async (req, res): Promise<void> => {
+  const db = getDb();
   const parsed = CreateResourceBody.safeParse(req.body);
+
   if (!parsed.success) {
     res.status(400).json({ error: parsed.error.message });
     return;
@@ -34,8 +40,10 @@ router.post("/resources", async (req, res): Promise<void> => {
 });
 
 router.delete("/resources/:id", async (req, res): Promise<void> => {
+  const db = getDb();
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const params = DeleteResourceParams.safeParse({ id: parseInt(raw, 10) });
+
   if (!params.success) {
     res.status(400).json({ error: params.error.message });
     return;
